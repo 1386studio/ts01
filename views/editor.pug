@@ -1,0 +1,71 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title layer iframe 示例
+    link(rel='stylesheet', href='/layui/css/layui.css', media='all')
+    script(type='text/javascript', charset='utf-8', src='/Neditor/neditor.config.js')
+    script(type='text/javascript', charset='utf-8', src='/Neditor/neditor.all.min.js')
+    script(type='text/javascript', charset='utf-8', src='/Neditor/neditor.service.js')
+    script(type='text/javascript', charset='utf-8', src='/Neditor/i18n/zh-cn/zh-cn.js')
+    script(type='text/javascript', src='/Neditor/third-party/browser-md5-file.min.js')
+    style.
+      body{padding:10px; font-size:14px; background:#fff; width:95%; margin:0 auto; font-size:14px; line-height:20px; overflow:hidden;}
+      p{margin-bottom:10px;}
+      input{border:1px solid #999; padding:5px 10px; margin:0 10px 10px 0;}
+  body#fff
+    input.layui-input(type='text', name='title', placeholder='请输入标题1', autocomplete='off')
+    input.layui-input(type='text', name='title', placeholder='请输入标题2', autocomplete='off')
+    input.layui-input(type='text', name='title', placeholder='请输入标题3', autocomplete='off')
+    script#editor
+    div(style="margin-top:10px;text-align:center")
+        a#printpdf.layui-btn.layui-btn-primary(download="code.pdf") 导出PDF
+    script(src='/javascripts/jquery.min.js')
+    script.
+        var ue = UE.getEditor('editor',{
+            toolbars: [
+                [
+                    "fullscreen",
+                    "source",
+                    "|",
+                    "undo",
+                    "redo"
+                ]
+            ],
+            initialFrameHeight:330
+        });
+        //注意：parent 是 JS 自带的全局对象，可用于操作父页面
+        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+
+        //让层自适应iframe
+        $('#add').on('click', function(){
+            $('body').append('。');
+            parent.layer.iframeAuto(index);
+        });
+        //在父层弹出一个层
+        $('#printpdf').on('click', function(){
+            $.get('/editor/print', function(data) {
+                var a = document.createElement('a');
+                var url = data.url;
+                var filename = data.name;
+                a.href = url;
+                a.download = filename;
+                a.click();
+            });
+        });
+        //给父页面传值
+        $('#transmit').on('click', function(){
+            parent.$('#parentIframe').text('我被改变了');
+            parent.layer.tips('Look here', '#parentIframe', {time: 5000});
+            parent.layer.close(index);
+        });
+        //关闭iframe
+        $('#closeIframe').click(function(){
+            var val = $('#name').val();
+            if(val === ''){
+                parent.layer.msg('请填写标记');
+                return;
+            }
+            parent.layer.msg('您将标记 [ ' +val + ' ] 成功传送给了父窗口');
+            parent.layer.close(index);
+        });
