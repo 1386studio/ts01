@@ -329,27 +329,26 @@ html
         var table = layui.table;
         table.render({
           elem: '#test'
-          ,url:'/api/user.json'
+          ,url: '/index/list'
           ,height:'full-130'
           ,toolbar: '#toolbarDemo'
           ,title: '用户数据表'
+          ,page: {
+            limit: 5,
+            curr: 1
+          }
           ,cols: [[
             {type: 'checkbox', fixed: 'left'}
-            ,{field:'id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true}
-            ,{field:'username', title:'用户名', width:120, edit: 'text'}
-            ,{field:'email', title:'邮箱', width:150, edit: 'text', templet: function(res){
-              return '<em>'+ res.email +'</em>'
+            ,{field:'_id', title:'ID', fixed: 'left', unresize: true, sort: true}
+            ,{field:'original_source_name', title:'来源'}
+            ,{field:'title', title:'标题', }
+            ,{field:'author', title:'作者'}
+            ,{field:'publish_time', title:'发布时间'}
+            ,{field:'url', title:'URL', templet: function(res){
+              return '<a target="_blank" href="'+ res.url +'">'+ res.url+'</a>'
             }}
-            ,{field:'sex', title:'性别', width:80, edit: 'text', sort: true}
-            ,{field:'city', title:'城市', width:100}
-            ,{field:'sign', title:'签名'}
-            ,{field:'experience', title:'积分', width:80, sort: true}
-            ,{field:'ip', title:'IP', width:120}
-            ,{field:'logins', title:'登入次数', width:100, sort: true}
-            ,{field:'joinTime', title:'加入时间', width:120}
-            ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+            ,{fixed: 'right', title:'操作', toolbar: '#barDemo'}
           ]]
-          ,page: true
         });
         
         //头工具栏事件
@@ -386,7 +385,7 @@ html
               fixed: true, //不固定
               maxmin: false,
               resize: false,
-              content: '/editor'
+              content: '/editor?_id='+obj.data._id
             });
           }
         });

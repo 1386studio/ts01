@@ -22,6 +22,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/index', indexRouter);
 app.use('/editor', editorRouter);
 app.use('/viewer', viewerRouter);
 app.use('/users', usersRouter);

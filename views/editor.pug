@@ -5,7 +5,7 @@ html
     title layer iframe 示例
     link(rel='stylesheet', href='/layui/css/layui.css', media='all')
     script(type='text/javascript', charset='utf-8', src='/Neditor/neditor.config.js')
-    script(type='text/javascript', charset='utf-8', src='/Neditor/neditor.all.min.js')
+    script(type='text/javascript', charset='utf-8', src='/Neditor/neditor.all.js')
     script(type='text/javascript', charset='utf-8', src='/Neditor/neditor.service.js')
     script(type='text/javascript', charset='utf-8', src='/Neditor/i18n/zh-cn/zh-cn.js')
     script(type='text/javascript', src='/Neditor/third-party/browser-md5-file.min.js')
@@ -14,25 +14,46 @@ html
       p{margin-bottom:10px;}
       input{border:1px solid #999; padding:5px 10px; margin:0 10px 10px 0;}
   body#fff
-    input.layui-input(type='text', name='title', placeholder='请输入标题1', autocomplete='off')
-    input.layui-input(type='text', name='title', placeholder='请输入标题2', autocomplete='off')
-    input.layui-input(type='text', name='title', placeholder='请输入标题3', autocomplete='off')
+    input#title1.layui-input(type='text', name='title', placeholder='请输入标题1', autocomplete='off',value=article.headline)
+    input#title2.layui-input(type='text', name='title', placeholder='请输入标题2', autocomplete='off',value=article.title)
+    input#title3.layui-input(type='text', name='title', placeholder='请输入标题3', autocomplete='off',value=article.subtitle)
     script#editor
     div(style="margin-top:10px;text-align:center")
         a#printpdf.layui-btn.layui-btn-primary(download="code.pdf") 导出PDF
     script(src='/javascripts/jquery.min.js')
     script.
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r != null) return unescape(r[2]); return null; //返回参数值
+        }
         var ue = UE.getEditor('editor',{
+            wordCount:true,
+            maximumWords:80000,
+            elementPathEnabled:false,
             toolbars: [
                 [
                     "fullscreen",
                     "source",
                     "|",
                     "undo",
-                    "redo"
+                    "redo",
+                    "bold",
+                    "paragraph",
+                    "fontsize",
+                    "removeformat",
+                    "|",
+                    "justifyleft",
+                    "justifycenter",
+                    "justifyright",
+                    "justifyjustify",
                 ]
             ],
             initialFrameHeight:330
+        });
+        ue.ready(function() {
+            //设置编辑器的内容
+            ue.setContent('#{article.content}');
         });
         //注意：parent 是 JS 自带的全局对象，可用于操作父页面
         var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
@@ -44,13 +65,20 @@ html
         });
         //在父层弹出一个层
         $('#printpdf').on('click', function(){
-            $.get('/editor/print', function(data) {
-                var a = document.createElement('a');
-                var url = data.url;
-                var filename = data.name;
-                a.href = url;
-                a.download = filename;
-                a.click();
+            $.ajax({
+                url: "/editor/save?_id="+getUrlParam('_id'),
+                type: "POST",
+                data: {headline:$('#title1').val(),title:$('#title2').val(),subtitle:$('#title3').val(),content: ue.getContent()},
+                success: function (re) {
+                    $.get('/editor/print', function(data) {
+                        var a = document.createElement('a');
+                        var url = data.url;
+                        var filename = data.name;
+                        a.href = url;
+                        a.download = filename;
+                        a.click();
+                    });
+                }
             });
         });
         //给父页面传值
