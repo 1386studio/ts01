@@ -20,6 +20,7 @@ html
     script#editor
     div(style="margin-top:10px;text-align:center")
         a#printpdf.layui-btn.layui-btn-primary(download="code.pdf") 导出PDF
+        a#previewpdf.layui-btn.layui-btn-primary 预览PDF
     script(src='/javascripts/jquery.min.js')
     script.
         function getUrlParam(name) {
@@ -30,6 +31,7 @@ html
         var ue = UE.getEditor('editor',{
             wordCount:true,
             maximumWords:80000,
+            allowDivTransToP: false,
             elementPathEnabled:false,
             toolbars: [
                 [
@@ -53,7 +55,7 @@ html
         });
         ue.ready(function() {
             //设置编辑器的内容
-            ue.setContent('#{article.content}');
+            ue.setContent(`!{article.content}`);
         });
         //注意：parent 是 JS 自带的全局对象，可用于操作父页面
         var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
@@ -70,13 +72,30 @@ html
                 type: "POST",
                 data: {headline:$('#title1').val(),title:$('#title2').val(),subtitle:$('#title3').val(),content: ue.getContent()},
                 success: function (re) {
-                    $.get('/editor/print', function(data) {
+                    $.get("/editor/print?_id="+getUrlParam('_id'), function(data) {
                         var a = document.createElement('a');
                         var url = data.url;
-                        var filename = data.name;
+                        var filename = "#{article.title}.pdf";
                         a.href = url;
                         a.download = filename;
                         a.click();
+                    });
+                }
+            });
+        });
+        $('#previewpdf').on('click', function(){
+            $.ajax({
+                url: "/editor/save?_id="+getUrlParam('_id'),
+                type: "POST",
+                data: {headline:$('#title1').val(),title:$('#title2').val(),subtitle:$('#title3').val(),content: ue.getContent()},
+                success: function (re) {
+                    parent.layer.open({
+                        type: 2,
+                        area: ['800px', '650px'],
+                        fixed: true, //不固定
+                        maxmin: false,
+                        resize: false,
+                        content: '/viewer?_id='+getUrlParam('_id')
                     });
                 }
             });

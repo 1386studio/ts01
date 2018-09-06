@@ -2,9 +2,51 @@ doctype html
 html
   head
     meta(charset='utf-8')
+    style.
+      body {
+        zoom:0.7;
+      }
+      img {
+        width: 80%;
+      }
+      .page {
+        width: 21cm; 
+        min-height: 29.7cm; 
+        padding: 33.5mm 26mm 30mm 28mm; 
+        margin: 1cm auto; 
+        border: 1px #D3D3D3 solid; 
+        border-radius: 5px; 
+        background: white; 
+        box-shadow: 0 0 5px rgba(0，0，0，0.1);
+      }
+      .content p{
+        text-indent:2em;
+        margin:0;
+      }
+      @media print {
+        body {
+          zoom:1;
+        }
+        .page {
+          width: 100%; 
+          min-height: auto;
+          margin: 0; 
+          border: none; 
+          border-radius: 0; 
+          background: white; 
+          box-shadow: none;
+          padding: 0; 
+        }
+        .content p{
+          text-indent:2em;
+          margin:0;
+        }
+      }
   body(style="padding:0px;margin:0px;width:100%;")
-    h3(style="font-family: '黑体';")= article.headline
-    h1(style="font-family: '黑体';text-align: center;")= article.title
-    h4(style="font-family: '仿宋';text-align: center;")= article.subtitle
-    .content(style="font-family: '仿宋';text-align: justify;font-size:12pt")= article.content
-        
+    .page
+      h3(style="font-family: '楷体';font-size:17.1pt;margin:0;line-height:29pt")= article.headline
+      p(style="line-height:29pt;margin: 0;") &nbsp;
+      h1(style="font-family: 'FZXiaoBiaoSong-B05S';text-align: center;font-size:23.5pt;line-height:29pt;margin:0")= article.title
+      h4(style="font-family: '楷体';text-align: center;font-size:17.1pt;line-height:29pt;margin:0")= article.subtitle
+      p(style="line-height:29pt;margin: 0;") &nbsp;
+      .content(style="font-family: '仿宋_GB2312';text-align: justify;font-size:17.1pt;line-height:29pt;margin:0")!= article.content

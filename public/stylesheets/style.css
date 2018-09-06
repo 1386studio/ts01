@@ -1359,3 +1359,6 @@ html {
       overflow: auto
   }
 }
+.layui-table-tool {
+  background: #fff;
+}

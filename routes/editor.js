@@ -2,19 +2,21 @@ var express = require('express');
 const puppeteer = require('puppeteer');
 var router = express.Router();
 var axios = require('axios');
+var querystring = require('querystring');
+var config = require('../common');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   axios
 	.all([
-    axios.get('http://192.168.2.43:1337/articles?_id='+req.query._id)
+    axios.get(`${config.api_server}/articles?_id=${req.query._id}`)
   ])
 	.then(axios.spread((res1)=>{
-    res1.data[0].content = res1.data[0].content.replace(/<\/?[^>]*>/g,''); //去除HTML tag
-    res1.data[0].content = res1.data[0].content.replace(/[ | ]*\n/g,'\n'); //去除行尾空白
+    console.log(decodeURI(res1.data[0].content));
+    res1.data[0].content = decodeURI(res1.data[0].content);
     res1.data[0].content = res1.data[0].content.replace(/\n[\s| | ]*\r/g,'\n'); //去除多余空行
-    res1.data[0].content = res1.data[0].content.replace(/ /ig,'');//去掉 
-    res1.data[0].content = res1.data[0].content.replace(/^[\s　]+|[\s　]+$/g, "");//去掉全角半角空格
+    // res1.data[0].content = res1.data[0].content.replace(/ /ig,'');//去掉 
+    // res1.data[0].content = res1.data[0].content.replace(/^[\s　]+|[\s　]+$/g, "");//去掉全角半角空格
     res1.data[0].content = res1.data[0].content.replace(/[\r\n]/g,"");//去掉回车换行
 		res.render('editor', { title: 'Express' ,article:res1.data[0]});
 	}))
@@ -22,10 +24,13 @@ router.get('/', function(req, res, next) {
 router.post('/save', function(req, res, next) {
   axios
 	.all([
-    axios.put('http://192.168.2.43:1337/articles?_id='+req.query._id, req.body)
+    axios.put(`${config.api_server}/articles/${req.query._id}`, querystring.stringify(req.body), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }
+    })
   ])
 	.then(axios.spread((res1)=>{
-    console.log(res1.data);
 		res.end();
 	}))
 });
@@ -36,15 +41,16 @@ router.get('/print', function(req, res, next) {
       headless: true
     });
     const page = await browser.newPage();
-    await page.goto('/viewer?_id='+req.query._id, {waitUntil: 'networkidle2'});
-    const pagepdf = await page.pdf({path: 'public/幅度萨芬.pdf', format: 'A4',margin:{
-        top: '20mm',
-        left: '15mm',
-        right: '15mm',
-        bottom: '20mm'
+    await page.emulateMedia('print');
+    await page.goto(`${config.puppeteer_server}/viewer?_id=${req.query._id}`, {waitUntil: 'networkidle2'});
+    const pagepdf = await page.pdf({path: 'public/'+req.query._id+'.pdf', format: 'A4',margin:{
+        top: '33.5mm',
+        left: '28mm',
+        right: '26mm',
+        bottom: '30mm'
     }});
     await browser.close();
-    res.send({url:"/幅度萨芬.pdf",name:"幅度萨芬.pdf"});
+    res.send({url:"/"+req.query._id+".pdf",name:"XXX.pdf"});
     res.end();
   })();
 });
