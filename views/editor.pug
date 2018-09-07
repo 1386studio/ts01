@@ -33,6 +33,10 @@ html
             maximumWords:80000,
             allowDivTransToP: false,
             elementPathEnabled:false,
+            customstyle:[
+                {tag:'p', name:'tc', label:'段落标题', style:'font-family:黑体;font-size:17.1pt;'},
+                {tag:'p', name:'tl',label:'正文', style:'font-family:仿宋_GB2312;font-size:17.1pt;'}
+            ],
             toolbars: [
                 [
                     "fullscreen",
@@ -41,8 +45,9 @@ html
                     "undo",
                     "redo",
                     "bold",
-                    "paragraph",
-                    "fontsize",
+                    "customstyle",
+                    //- "paragraph",
+                    //- "fontsize",
                     "removeformat",
                     "|",
                     "justifyleft",

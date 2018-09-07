@@ -9,16 +9,15 @@ var config = require('../common');
 router.get('/', function(req, res, next) {
   axios
 	.all([
-    axios.get(`${config.api_server}/articles?_id=${req.query._id}`)
+    axios.get(`${config.api_server}/articles/${req.query._id}`)
   ])
 	.then(axios.spread((res1)=>{
-    console.log(decodeURI(res1.data[0].content));
-    res1.data[0].content = decodeURI(res1.data[0].content);
-    res1.data[0].content = res1.data[0].content.replace(/\n[\s| | ]*\r/g,'\n'); //去除多余空行
+    res1.data.content = decodeURI(res1.data.content);
+    res1.data.content = res1.data.content.replace(/\n[\s| | ]*\r/g,'\n'); //去除多余空行
     // res1.data[0].content = res1.data[0].content.replace(/ /ig,'');//去掉 
     // res1.data[0].content = res1.data[0].content.replace(/^[\s　]+|[\s　]+$/g, "");//去掉全角半角空格
-    res1.data[0].content = res1.data[0].content.replace(/[\r\n]/g,"");//去掉回车换行
-		res.render('editor', { title: 'Express' ,article:res1.data[0]});
+    res1.data.content = res1.data.content.replace(/[\r\n]/g,"");//去掉回车换行
+		res.render('editor', { title: 'Express' ,article:res1.data});
 	}))
 });
 router.post('/save', function(req, res, next) {

@@ -6,10 +6,10 @@ var config = require('../common');
 router.get('/', function(req, res, next) {
   axios
 	.all([
-    axios.get(`${config.api_server}/articles?_id=${req.query._id}`)
+    axios.get(`${config.api_server}/articles/${req.query._id}`)
   ])
 	.then(axios.spread((res1)=>{
-    res.render('viewer', { title: 'Express', article: res1.data[0] });
+    res.render('viewer', { title: 'Express', article: res1.data });
 	}))
 });
 
